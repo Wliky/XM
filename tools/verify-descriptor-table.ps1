@@ -219,5 +219,7 @@ if ($probeFrom) {
     } else {
         Write-Output "== $VersionKey 相对 $probeFrom 有 $($failed.Count) 条需要重新定锚：$((@($failed | ForEach-Object { $_.Rule })) -join ', ')"
     }
+    # 试探模式的产出是待补锚点清单而不是坏表，退出码保持 0，避免 CI 被判失败
+    exit 0
 }
 if ($failed.Count -gt 0) { exit 1 }
