@@ -114,6 +114,38 @@ jobs:
             } >> "${GITHUB_STEP_SUMMARY}"
           fi
 
+      - name: 生成描述符草案
+        if: ${{ inputs.probe && always() }}
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          descriptors=rules/wechat.descriptors.json
+          if [ ! -f "${descriptors}" ]; then descriptors=app/src/main/assets/descriptors/wechat.json; fi
+          rules=rules/wechat.json
+          if [ ! -f "${rules}" ]; then rules=app/src/main/assets/anchors/wechat.json; fi
+          pwsh -NoProfile -File tools/gen-descriptor-section.ps1 \
+            -Cache build/cache/cache.dxc2 \
+            -Target "${{ inputs.version_code }}" \
+            -Rules "${rules}" \
+            -Descriptors "${descriptors}" \
+            -DexSql "${DEXSQL}" \
+            -Out build/descriptors || true
+          # 生成的条目再回放一遍，只有全部 EXACT 才适合合并进正式表
+          generated=build/descriptors/${{ inputs.version_code }}.table.json
+          if [ -f "${generated}" ]; then
+            pwsh -NoProfile -File tools/verify-descriptor-table.ps1 \
+              -Cache build/cache/cache.dxc2 \
+              -VersionKey "${{ inputs.version_code }}" \
+              -Descriptors "${generated}" \
+              -DexSql "${DEXSQL}" | tee build/descriptors/verify.log || true
+            {
+              echo "## 草案校验 versionCode ${{ inputs.version_code }}"
+              echo '```'
+              tail -n 40 build/descriptors/verify.log
+              echo '```'
+            } >> "${GITHUB_STEP_SUMMARY}"
+          fi
+
       - name: 打包（未签名）
         env:
           RULES_VERSION: ${{ inputs.rules_version }}
@@ -135,6 +167,9 @@ jobs:
           name: rules-${{ inputs.version_code }}
           path: |
             build/verify.log
+            build/descriptors/*.json
+            build/descriptors/verify.log
+            build/gen-progress.log
             build/rules/*.pack.json
           if-no-files-found: warn
           retention-days: 14
