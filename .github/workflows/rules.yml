@@ -21,6 +21,10 @@ on:
         description: 校验通过后签名并发布到规则分发仓
         type: boolean
         default: false
+      commit_draft:
+        description: 把草案里已定锚的条目合并进描述符表并提交（配合 probe 使用）
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -90,6 +94,8 @@ jobs:
           ls -lh build/cache
 
       - name: 回放描述符表
+        # probe 本身就是试探，缺失是预期结果，不因此判失败
+        continue-on-error: ${{ inputs.probe }}
         env:
           ALLOW_FALLBACK: ${{ inputs.probe }}
         run: |
@@ -145,6 +151,37 @@ jobs:
               echo '```'
             } >> "${GITHUB_STEP_SUMMARY}"
           fi
+
+      - name: 合并草案并提交
+        if: ${{ inputs.probe && inputs.commit_draft }}
+        run: |
+          set -euo pipefail
+          descriptors=rules/wechat.descriptors.json
+          if [ ! -f "${descriptors}" ]; then descriptors=app/src/main/assets/descriptors/wechat.json; fi
+          draft=build/descriptors/${{ inputs.version_code }}.section.json
+          if [ ! -f "${draft}" ]; then
+            echo "没有草案产物，跳过合并"
+            exit 0
+          fi
+          pwsh -NoProfile -File tools/merge-descriptor-section.ps1 \
+            -Descriptors "${descriptors}" \
+            -Draft "${draft}" \
+            -Apply | tee build/merge.log
+          {
+            echo "## 合并 versionCode ${{ inputs.version_code }}"
+            echo '```'
+            cat build/merge.log
+            echo '```'
+          } >> "${GITHUB_STEP_SUMMARY}"
+          if git diff --quiet -- "${descriptors}"; then
+            echo "没有新增条目，不提交"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "${descriptors}"
+          git -c core.autocrlf=false commit -m "descriptor: 合并 versionCode ${{ inputs.version_code }} 草案（仅已定锚条目）"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
 
       - name: 打包（未签名）
         env:
