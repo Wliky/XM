@@ -1,0 +1,162 @@
+name: rules
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_code:
+        description: 微信 versionCode（如 3200）
+        required: true
+      apk_url:
+        description: APK 直链（自己托管的合法来源）
+        required: true
+      rules_version:
+        description: 规则版本号，留空则取规则文件里的 rulesVersion
+        required: false
+        default: ""
+      publish:
+        description: 校验通过后签名并发布到规则分发仓
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rules-${{ inputs.version_code }}
+  cancel-in-progress: false
+
+env:
+  HOST_ID: wechat
+  DEXSQL: ${{ github.workspace }}/bin/dexsql
+
+jobs:
+  rules:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 准备 dexsql
+        env:
+          DEXSQL_URL: ${{ secrets.DEXSQL_URL }}
+        run: |
+          set -euo pipefail
+          mkdir -p bin build/apk build/cache build/rules
+          if [ -n "${DEXSQL_URL}" ]; then
+            case "${DEXSQL_URL}" in
+              *.zip)
+                curl -fsSL "${DEXSQL_URL}" -o /tmp/dexsql.zip
+                unzip -o -q /tmp/dexsql.zip -d /tmp/dexsql
+                cp "$(find /tmp/dexsql -type f -name 'dexsql*' | head -n 1)" bin/dexsql
+                ;;
+              *)
+                curl -fsSL "${DEXSQL_URL}" -o bin/dexsql
+                ;;
+            esac
+          else
+            cargo install --git https://github.com/LSPosed/DexSQL --locked --root "${HOME}/.dexsql" dexsql
+            cp "${HOME}/.dexsql/bin/dexsql" bin/dexsql
+          fi
+          chmod +x bin/dexsql
+          bin/dexsql --help > /tmp/dexsql-help.txt 2>&1 || { echo "dexsql 不可用"; exit 1; }
+          head -n 5 /tmp/dexsql-help.txt
+
+      - name: 下载 APK
+        env:
+          APK_URL: ${{ inputs.apk_url }}
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 --retry-delay 2 -o build/apk/wechat.apk "${APK_URL}"
+          ls -lh build/apk/wechat.apk
+
+      - name: 建立索引缓存
+        run: |
+          set -euo pipefail
+          bin/dexsql prepare-cache --input build/apk/wechat.apk --output build/cache
+          ls -lh build/cache
+
+      - name: 回放描述符表
+        run: |
+          set -euo pipefail
+          descriptors=rules/wechat.descriptors.json
+          if [ ! -f "${descriptors}" ]; then descriptors=app/src/main/assets/descriptors/wechat.json; fi
+          pwsh -NoProfile -File tools/verify-descriptor-table.ps1 \
+            -Cache build/cache/cache.dxc2 \
+            -VersionKey "${{ inputs.version_code }}" \
+            -Descriptors "${descriptors}" \
+            -DexSql "${DEXSQL}" | tee build/verify.log
+
+      - name: 校验报告
+        if: always()
+        run: |
+          if [ -f build/verify.log ]; then
+            {
+              echo "## versionCode ${{ inputs.version_code }}"
+              echo '```'
+              tail -n 80 build/verify.log
+              echo '```'
+            } >> "${GITHUB_STEP_SUMMARY}"
+          fi
+
+      - name: 打包（未签名）
+        env:
+          RULES_VERSION: ${{ inputs.rules_version }}
+        run: |
+          set -euo pipefail
+          payload=rules/wechat.json
+          if [ ! -f "${payload}" ]; then payload=app/src/main/assets/anchors/wechat.json; fi
+          extra=()
+          if [ -n "${RULES_VERSION}" ]; then extra+=(--version "${RULES_VERSION}"); fi
+          python3 tools/rule-pack.py pack \
+            --payload "${payload}" \
+            --out build/rules/wechat-unsigned.pack.json \
+            --unsigned "${extra[@]}"
+
+      - name: 上传产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: rules-${{ inputs.version_code }}
+          path: |
+            build/verify.log
+            build/rules/*.pack.json
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: 发布
+        if: ${{ inputs.publish }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RULES_REPO: ${{ vars.RULES_REPO || github.repository }}
+          SIGN_KEY: ${{ secrets.RULES_SIGN_KEY }}
+          RULES_VERSION: ${{ inputs.rules_version }}
+        run: |
+          set -euo pipefail
+          [ -n "${SIGN_KEY}" ] || { echo "缺少 secrets.RULES_SIGN_KEY；只想出报告就不勾 publish"; exit 1; }
+          printf '%s\n' "${SIGN_KEY}" > /tmp/rule-sign.pem
+          payload=rules/wechat.json
+          if [ ! -f "${payload}" ]; then payload=app/src/main/assets/anchors/wechat.json; fi
+          extra=()
+          if [ -n "${RULES_VERSION}" ]; then extra+=(--version "${RULES_VERSION}"); fi
+          python3 tools/rule-pack.py pack \
+            --payload "${payload}" \
+            --key /tmp/rule-sign.pem \
+            --out build/rules/wechat.pack.json \
+            "${extra[@]}"
+          python3 tools/rule-pack.py verify --pack build/rules/wechat.pack.json
+          rm -f /tmp/rule-sign.pem
+          tag="rules-${{ inputs.version_code }}-$(date -u +%Y%m%d%H%M)"
+          gh release create "${tag}" build/rules/wechat.pack.json#wechat.pack.json \
+            --repo "${RULES_REPO}" \
+            --title "rules versionCode=${{ inputs.version_code }}" \
+            --notes "versionCode=${{ inputs.version_code }}"
+          # 滚动 tag：设备地址固定指向这里，避免 releases/latest 被其他 release（如 dexsql）顶掉
+          if gh release view rules-latest --repo "${RULES_REPO}" >/dev/null 2>&1; then
+            gh release upload rules-latest build/rules/wechat.pack.json#wechat.pack.json \
+              --repo "${RULES_REPO}" --clobber
+          else
+            gh release create rules-latest build/rules/wechat.pack.json#wechat.pack.json \
+              --repo "${RULES_REPO}" --title "rules latest" \
+              --notes "滚动规则包，设备更新地址固定用这个 tag"
+          fi
+          echo "存档：https://github.com/${RULES_REPO}/releases/tag/${tag}"
+          echo "设备地址：https://github.com/${RULES_REPO}/releases/download/rules-latest/wechat.pack.json"

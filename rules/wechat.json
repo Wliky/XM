@@ -1,0 +1,452 @@
+{
+  "schemaVersion": 1,
+  "hostId": "wechat",
+  "rulesVersion": 21,
+  "signature": "",
+  "rules": [
+    {
+      "id": "revoke_entry",
+      "strings": ["doRevokeMsg xmlSrvMsgId", "summerbadcr get a revoke"],
+      "paramCount": 6,
+      "returnType": "void",
+      "packagePrefix": "",
+      "staticName": "",
+      "offlineDescriptor": ""
+    },
+    {
+      "id": "system_notice_insert",
+      "strings": ["will insert sysmsg from:", "sysmsg inserted:"],
+      "paramCount": 3,
+      "returnType": "void",
+      "packagePrefix": "",
+      "staticName": "",
+      "offlineDescriptor": ""
+    },
+    {
+      "id": "block_typing_report",
+      "strings": ["MicroMsg.SignallingComponent", "[doDirectSend] mChattingContext is null!"],
+      "exactStrings": true,
+      "paramCount": 1,
+      "returnType": "void",
+      "packagePrefix": "Lcom/tencent/mm/ui/chatting/component/",
+      "staticName": "",
+      "offlineDescriptor": ""
+    },
+    {
+      "id": "voice_recorder_duration",
+      "strings": [],
+      "classStrings": ["Stop file success: "],
+      "paramCount": 0,
+      "returnType": "long",
+      "offlineDescriptor": ""
+    },
+    {
+      "id": "scan_camera_handler",
+      "strings": ["MicroMsg.QBarStringHandler", "key_offline_scan_show_tips"],
+      "exactStrings": true,
+      "returnType": "void",
+      "all": true,
+      "offlineDescriptor": ""
+    },
+    {
+      "id": "red_packet_open",
+      "strings": [],
+      "classStrings": ["openwxhb"],
+      "methodName": "onGYNetEnd",
+      "paramCount": 3,
+      "returnType": "void",
+      "offlineDescriptor": ""
+    },
+    {
+      "id": "red_packet_detail",
+      "strings": [],
+      "classStrings": ["qrydetailwxhb"],
+      "methodName": "onGYNetEnd",
+      "paramCount": 3,
+      "returnType": "void",
+      "offlineDescriptor": ""
+    },
+    {
+      "id": "red_packet_time",
+      "strings": ["HH:mm"],
+      "paramCount": 2,
+      "returnType": "java.lang.String",
+      "offlineDescriptor": ""
+    },
+    {
+      "id": "chat_bind",
+      "strings": [],
+      "classStrings": ["MicroMsg.ChattingDataAdapterV3"],
+      "methodName": "C0",
+      "paramCount": 2,
+      "returnType": "void",
+      "offlineDescriptor": "com.tencent.mm.ui.chatting.adapter.k#C0(2)void"
+    },
+    {
+      "id": "message_menu_create",
+      "strings": ["MicroMsg.ChattingItem", "msg is null!"],
+      "paramCount": 3,
+      "returnType": "void",
+      "packagePrefix": "Lcom/tencent/mm/ui/chatting/viewitems/",
+      "all": true,
+      "offlineDescriptor": "com.tencent.mm.ui.chatting.viewitems.o0#a(3)void"
+    },
+    {
+      "id": "message_menu_click",
+      "strings": ["MicroMsg.ChattingItem", "context item select failed, null dataTag"],
+      "paramCount": 2,
+      "returnType": "void",
+      "offlineDescriptor": "com.tencent.mm.ui.chatting.viewitems.r0#onMMMenuItemSelected(2)void"
+    },
+    {
+      "id": "transmit_done",
+      "strings": ["SendMsgUsernames", "sendResult"],
+      "paramCount": 1,
+      "returnType": "void",
+      "offlineDescriptor": "com.tencent.mm.ui.transmit.MsgRetransmitUI#D7(1)void"
+    },
+    {
+      "id": "fav_menu_create",
+      "strings": [],
+      "paramCount": 3,
+      "returnType": "void",
+      "offlineDescriptor": "com.tencent.mm.plugin.fav.ui.cd#a(3)void"
+    },
+    {
+      "id": "fav_menu_click",
+      "paramCount": 4,
+      "returnType": "void",
+      "offlineDescriptor": "com.tencent.mm.plugin.fav.ui.FavoriteIndexUI#W7(4)void",
+      "maxVersionCode": 3219
+    },
+    {
+      "id": "fav_menu_click",
+      "strings": [],
+      "paramCount": 4,
+      "returnType": "void",
+      "offlineDescriptor": "com.tencent.mm.plugin.fav.ui.FavoriteIndexUI#f8(4)void",
+      "minVersionCode": 3220
+    },
+    {
+      "id": "fav_activity_result",
+      "strings": [],
+      "paramCount": 3,
+      "returnType": "void",
+      "offlineDescriptor": "com.tencent.mm.plugin.fav.ui.FavoriteIndexUI#onActivityResult(3)void"
+    },
+    {
+      "id": "fav_select_click",
+      "strings": [],
+      "paramCount": 4,
+      "returnType": "void",
+      "offlineDescriptor": "com.tencent.mm.plugin.fav.ui.FavSelectUI#onItemClick(4)void"
+    },
+    {
+      "id": "fav_data_path",
+      "strings": [],
+      "paramCount": 1,
+      "returnType": "java.lang.String",
+      "offlineDescriptor": "jd2.a3#y(Lnd5/zr0;)java.lang.String",
+      "maxVersionCode": 3219
+    },
+    {
+      "id": "fav_data_path",
+      "strings": [],
+      "paramCount": 1,
+      "returnType": "java.lang.String",
+      "offlineDescriptor": "be2.a3#y(1)java.lang.String",
+      "minVersionCode": 3220
+    },
+    {
+      "id": "fav_download",
+      "strings": [],
+      "paramCount": 2,
+      "returnType": "void",
+      "offlineDescriptor": "jd2.a3#F0(2)void",
+      "maxVersionCode": 3219
+    },
+    {
+      "id": "fav_download",
+      "strings": [],
+      "paramCount": 2,
+      "returnType": "void",
+      "offlineDescriptor": "be2.a3#F0(2)void",
+      "minVersionCode": 3220
+    },
+    {
+      "id": "fav_vfs_open",
+      "strings": [],
+      "paramCount": 1,
+      "returnType": "java.io.InputStream",
+      "offlineDescriptor": "com.tencent.mm.vfs.z6#E(1)java.io.InputStream"
+    },
+    {
+      "id": "fav_list_attr_init",
+      "strings": [],
+      "paramCount": 0,
+      "returnType": "void",
+      "offlineDescriptor": "com.tencent.mm.ui.contact.l5#e(0)void"
+    },
+    {
+      "id": "fav_list_attr_build",
+      "strings": [],
+      "paramCount": 1,
+      "returnType": "int",
+      "offlineDescriptor": "com.tencent.mm.ui.contact.l5#g(1)int"
+    },
+    {
+      "id": "fav_menu_icon_add",
+      "strings": [],
+      "paramCount": 5,
+      "returnType": "android.view.MenuItem",
+      "offlineDescriptor": "ak5.h4#c(5)android.view.MenuItem"
+    },
+    {
+      "id": "call_media_occupy",
+      "strings": ["MicroMsg.DeviceOccupy"],
+      "returnType": "boolean",
+      "offlineDescriptor": "sq.b#y(0)boolean"
+    },
+    {
+      "id": "call_media_voice_guard",
+      "strings": [],
+      "packagePrefix": "Lcom/tencent/mm/ui/chatting/viewitems/",
+      "paramCount": 3,
+      "returnType": "boolean",
+      "invokes": ["Lcom/tencent/mm/autogen/events/VoipCheckIsDeviceUsingEvent;-><init>()V"],
+      "all": true,
+      "offlineDescriptor": "com.tencent.mm.ui.chatting.viewitems.sq#g(3)boolean"
+    },
+    {
+      "id": "moments_detail_time",
+      "strings": ["getTimeString"],
+      "exactStrings": true,
+      "paramCount": 0,
+      "returnType": "java.lang.String",
+      "offlineDescriptor": "cl4.p#f1(0)java.lang.String"
+    },
+    {
+      "id": "moments_detail_group",
+      "strings": ["getShowGroupEnable"],
+      "exactStrings": true,
+      "paramCount": 0,
+      "returnType": "java.lang.Boolean",
+      "offlineDescriptor": "cl4.p#W0(0)java.lang.Boolean"
+    },
+    {
+      "id": "moments_detail_formatter",
+      "strings": ["cerateTimeView", "formatTimeInGrid"],
+      "exactStrings": true,
+      "paramCount": 3,
+      "returnType": "void",
+      "offlineDescriptor": "xj4.e#g(3)void"
+    },
+    {
+      "id": "moments_detail_item",
+      "strings": ["getItem", "com.tencent.mm.plugin.sns.ui.SnsSelfAdapter"],
+      "exactStrings": true,
+      "paramCount": 1,
+      "returnType": "java.lang.Object",
+      "offlineDescriptor": "com.tencent.mm.plugin.sns.ui.rq#getItem(1)java.lang.Object"
+    },
+    {
+      "id": "sns_delete",
+      "strings": ["delete snsId:%s"],
+      "exactStrings": true,
+      "paramCount": 1,
+      "returnType": "boolean",
+      "offlineDescriptor": "com.tencent.mm.plugin.sns.storage.f2#delete(1)boolean"
+    },
+    {
+      "id": "sns_filter_update",
+      "strings": ["UPDATE SnsInfo SET sourceType = sourceType &"],
+      "returnType": "void",
+      "all": true,
+      "offlineDescriptor": "com.tencent.mm.plugin.sns.storage.f2#D5(1)void"
+    },
+    {
+      "id": "sns_clean_db_expire",
+      "strings": ["cleanDbExpireExcludeSelf"],
+      "exactStrings": true,
+      "paramCount": 4,
+      "returnType": "void",
+      "offlineDescriptor": "com.tencent.mm.plugin.sns.storage.f2#K1(4)void"
+    },
+    {
+      "id": "sns_mvvm_refresh",
+      "strings": ["submitRefreshAll"],
+      "paramCount": 4,
+      "returnType": "void",
+      "offlineDescriptor": "com.tencent.mm.plugin.mvvmlist.MvvmList#w(4)void"
+    },
+    {
+      "id": "sns_menu_create",
+      "strings": ["MicroMsg.TimelineOnCreateContextMenuListener", "onMMCreateContextMenu error"],
+      "methodName": "onCreateContextMenu",
+      "paramCount": 3,
+      "returnType": "void",
+      "offlineDescriptor": "com.tencent.mm.plugin.sns.ui.listener.h1#onCreateContextMenu(3)void"
+    },
+    {
+      "id": "sns_menu_click",
+      "strings": ["delete comment fail!!! snsInfo is null", "onMMMenuItemSelected"],
+      "methodName": "onMMMenuItemSelected",
+      "paramCount": 2,
+      "returnType": "void",
+      "offlineDescriptor": "com.tencent.mm.plugin.sns.ui.listener.c#onMMMenuItemSelected(2)void"
+    },
+    {
+      "id": "sns_menu_click_improve_2",
+      "strings": ["onMMMenuItemSelected", "com.tencent.mm.plugin.sns.ui.improve.item.click.BaseImproveClick$register$2"],
+      "methodName": "onMMMenuItemSelected",
+      "paramCount": 2,
+      "returnType": "void"
+    },
+    {
+      "id": "sns_menu_click_improve_3",
+      "strings": ["onMMMenuItemSelected", "com.tencent.mm.plugin.sns.ui.improve.item.click.BaseImproveClick$register$3"],
+      "methodName": "onMMMenuItemSelected",
+      "paramCount": 2,
+      "returnType": "void"
+    },
+    {
+      "id": "sns_menu_click_improve_4",
+      "strings": ["onMMMenuItemSelected", "com.tencent.mm.plugin.sns.ui.improve.item.click.ImproveMultiPhotoClick$register$1$1$1"],
+      "methodName": "onMMMenuItemSelected",
+      "paramCount": 2,
+      "returnType": "void"
+    },
+    {
+      "id": "game_emoji_send",
+      "classStrings": ["MicroMsg.emoji.EmojiMgrImpl"],
+      "methodName": "Y",
+      "paramCount": 5,
+      "returnType": "void",
+      "maxVersionCode": 3219
+    },
+    {
+      "id": "game_emoji_send",
+      "strings": [],
+      "returnType": "void",
+      "all": true,
+      "offlineDescriptor": "i82.h#Z(5)void",
+      "minVersionCode": 3220
+    },
+    {
+      "id": "game_emoji_send_6",
+      "paramCount": 6,
+      "returnType": "void",
+      "offlineDescriptor": "com.tencent.mm.feature.emoji.b0#Pj(6)void",
+      "maxVersionCode": 3219
+    },
+    {
+      "id": "game_emoji_send_6",
+      "strings": [],
+      "returnType": "void",
+      "offlineDescriptor": "com.tencent.mm.feature.emoji.b0#Vj(6)void",
+      "minVersionCode": 3220
+    },
+    {
+      "id": "revoke_syscmd",
+      "strings": [],
+      "classStrings": ["doRevokeMsg xmlSrvMsgId"],
+      "methodName": "j7",
+      "paramCount": 3,
+      "offlineDescriptor": "w41.u#j7(3)com.tencent.mm.modelbase.q0"
+    },
+    {
+      "id": "message_identity",
+      "strings": [],
+      "classStrings": [" (msgid,msgSvrid,type,status,createTime,talker,content,talkerid)  VALUES("],
+      "methodName": "U3",
+      "paramCount": 2,
+      "offlineDescriptor": "com.tencent.mm.storage.g9#U3(2)com.tencent.mm.storage.f9"
+    },
+    {
+      "id": "message_by_seq",
+      "strings": [],
+      "classStrings": [" (msgid,msgSvrid,type,status,createTime,talker,content,talkerid)  VALUES("],
+      "methodName": "O3",
+      "paramCount": 2,
+      "offlineDescriptor": "com.tencent.mm.storage.g9#O3(2)com.tencent.mm.storage.f9"
+    },
+    {
+      "id": "message_last_before",
+      "strings": [],
+      "classStrings": [" (msgid,msgSvrid,type,status,createTime,talker,content,talkerid)  VALUES("],
+      "methodName": "V7",
+      "paramCount": 2,
+      "offlineDescriptor": "com.tencent.mm.storage.g9#V7(2)com.tencent.mm.storage.f9"
+    },
+    {
+      "id": "display_name",
+      "strings": [],
+      "methodName": "A",
+      "paramCount": 2,
+      "returnType": "java.lang.String",
+      "offlineDescriptor": "com.tencent.mm.wallet_core.ui.s1#A(2)java.lang.String"
+    },
+    {
+      "id": "message_digest",
+      "strings": [],
+      "methodName": "d",
+      "paramCount": 5,
+      "returnType": "java.lang.String",
+      "offlineDescriptor": "ym.a0#d(5)java.lang.String"
+    },
+    {
+      "id": "message_insert",
+      "classStrings": ["MicroMsg.MsgInfoStorageLogic"],
+      "methodName": "y",
+      "paramCount": 1,
+      "returnType": "long",
+      "maxVersionCode": 3219
+    },
+    {
+      "id": "message_insert",
+      "classStrings": ["MicroMsg.MsgInfoStorageLogic"],
+      "methodName": "z",
+      "paramCount": 1,
+      "returnType": "long",
+      "offlineDescriptor": "w41.ba#z(1)long",
+      "minVersionCode": 3220
+    },
+    {
+      "id": "message_resolve_create_time",
+      "strings": ["[oneliang] fix recv msg db create time, last:%s"],
+      "paramCount": 2,
+      "returnType": "long",
+      "offlineDescriptor": "w41.ba#o(2)long"
+    },
+    {
+      "id": "tablet_pad_check",
+      "strings": ["inTabletEnv, no tablet condition matched, return false"],
+      "returnType": "boolean",
+      "offlineDescriptor": "com.tencent.mm.ui.ok#b(1)boolean"
+    },
+    {
+      "id": "tablet_pad_entry",
+      "strings": [],
+      "invokes": ["Lcom/tencent/mm/ui/ok;->b(Ljv5/w0;)Z"],
+      "paramCount": 0,
+      "returnType": "boolean",
+      "offlineDescriptor": "com.tencent.mm.ui.ok#C(0)boolean"
+    },
+    {
+      "id": "tablet_login_button",
+      "strings": ["loginAsOtherDeviceBtn"],
+      "exactStrings": true,
+      "paramCount": 2,
+      "returnType": "void",
+      "offlineDescriptor": "qb1.h0#a(2)void"
+    },
+    {
+      "id": "plus_menu_on_item_click",
+      "strings": ["MicroMsg.PlusSubMenuHelper"],
+      "methodName": "onItemClick",
+      "paramCount": 4,
+      "returnType": "void",
+      "offlineDescriptor": "com.tencent.mm.ui.zg#onItemClick(4)void"
+    }
+  ]
+}
