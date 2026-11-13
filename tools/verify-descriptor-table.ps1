@@ -101,8 +101,9 @@ function Read-MethodRows([string]$classDesc, [string]$name, [string]$retDesc) {
 
 if (-not (Test-Path $Descriptors)) { throw "缺少描述符表 $Descriptors" }
 $table = Get-Content $Descriptors -Raw | ConvertFrom-Json
+$available = @($table.versions.PSObject.Properties.Name) -join ' / '
 if (-not $table.versions.PSObject.Properties.Name.Contains($VersionKey)) {
-    throw "descriptor table has no section $VersionKey"
+    throw "descriptor table has no section $VersionKey（已登记：$available）"
 }
 $section = $table.versions.$VersionKey
 

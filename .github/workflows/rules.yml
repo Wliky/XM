@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version_code:
-        description: 微信 versionCode（如 3200）
+        description: 微信 versionCode，须已在描述符表登记（当前 3200 / 3220）
         required: true
       apk_url:
         description: APK 直链（自己托管的合法来源）
