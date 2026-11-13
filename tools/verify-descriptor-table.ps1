@@ -113,9 +113,9 @@ if (-not $table.versions.PSObject.Properties.Name.Contains($VersionKey)) {
     if ($keys.Count -eq 0) { throw "descriptor table has no numeric section（已登记：$available）" }
     $target = 0
     if ($VersionKey -match '^\d+$') { $target = [int]$VersionKey }
-    $below = @($keys | Where-Object { $_ -lt $target } | Sort-Object -Descending)
-    $probeFrom = if ($below.Count -gt 0) { [string]$below[0] } else { [string](($keys | Sort-Object -Descending)[0]) }
-    Write-Output "== section $VersionKey 未登记，改用 $probeFrom 试探回放"
+    # 取距离最近的已登记段：相邻版本混淆布局更接近，回放命中率才高。
+    $probeFrom = [string](($keys | Sort-Object { [math]::Abs($_ - $target) })[0])
+    Write-Output "== section $VersionKey 未登记，改用最近的 $probeFrom 试探回放"
 }
 $sectionKey = if ($probeFrom) { $probeFrom } else { $VersionKey }
 $section = $table.versions.$sectionKey
