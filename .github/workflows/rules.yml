@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version_code:
-        description: 微信 versionCode，须已在描述符表登记（当前 3200 / 3220）
+        description: 微信 versionCode（已登记 3200 / 3220；其他版本请勾 probe 试探）
         required: true
       apk_url:
         description: APK 直链（自己托管的合法来源）
@@ -13,6 +13,10 @@ on:
         description: 规则版本号，留空则取规则文件里的 rulesVersion
         required: false
         default: ""
+      probe:
+        description: 版本段未登记时，用最近的已登记段试探回放，输出需要补的锚点
+        type: boolean
+        default: false
       publish:
         description: 校验通过后签名并发布到规则分发仓
         type: boolean
@@ -86,6 +90,8 @@ jobs:
           ls -lh build/cache
 
       - name: 回放描述符表
+        env:
+          ALLOW_FALLBACK: ${{ inputs.probe }}
         run: |
           set -euo pipefail
           descriptors=rules/wechat.descriptors.json
@@ -123,6 +129,7 @@ jobs:
             --unsigned "${extra[@]}"
 
       - name: 上传产物
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: rules-${{ inputs.version_code }}
@@ -133,7 +140,7 @@ jobs:
           retention-days: 14
 
       - name: 发布
-        if: ${{ inputs.publish }}
+        if: ${{ inputs.publish && !inputs.probe }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RULES_REPO: ${{ vars.RULES_REPO || github.repository }}

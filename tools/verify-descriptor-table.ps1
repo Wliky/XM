@@ -2,7 +2,8 @@
     [Parameter(Mandatory = $true)][string]$Cache,
     [Parameter(Mandatory = $true)][string]$VersionKey,
     [string]$DexSql = $env:DEXSQL,
-    [string]$Descriptors = "app/src/main/assets/descriptors/wechat.json"
+    [string]$Descriptors = "app/src/main/assets/descriptors/wechat.json",
+    [string]$Probe = $env:ALLOW_FALLBACK
 )
 $ErrorActionPreference = "Stop"
 $exe = $DexSql
@@ -102,10 +103,22 @@ function Read-MethodRows([string]$classDesc, [string]$name, [string]$retDesc) {
 if (-not (Test-Path $Descriptors)) { throw "缺少描述符表 $Descriptors" }
 $table = Get-Content $Descriptors -Raw | ConvertFrom-Json
 $available = @($table.versions.PSObject.Properties.Name) -join ' / '
+$probeFrom = $null
 if (-not $table.versions.PSObject.Properties.Name.Contains($VersionKey)) {
-    throw "descriptor table has no section $VersionKey（已登记：$available）"
+    # 目标版本没登记时可选试探：拿最近的已登记段跑一遍，失败条目就是该补的锚点。
+    if ($Probe -ne 'true') {
+        throw "descriptor table has no section $VersionKey（已登记：$available），要试探回放请设 ALLOW_FALLBACK=true"
+    }
+    $keys = @($table.versions.PSObject.Properties.Name | Where-Object { $_ -match '^\d+$' } | ForEach-Object { [int]$_ })
+    if ($keys.Count -eq 0) { throw "descriptor table has no numeric section（已登记：$available）" }
+    $target = 0
+    if ($VersionKey -match '^\d+$') { $target = [int]$VersionKey }
+    $below = @($keys | Where-Object { $_ -lt $target } | Sort-Object -Descending)
+    $probeFrom = if ($below.Count -gt 0) { [string]$below[0] } else { [string](($keys | Sort-Object -Descending)[0]) }
+    Write-Output "== section $VersionKey 未登记，改用 $probeFrom 试探回放"
 }
-$section = $table.versions.$VersionKey
+$sectionKey = if ($probeFrom) { $probeFrom } else { $VersionKey }
+$section = $table.versions.$sectionKey
 
 $rows = @()
 foreach ($prop in $section.PSObject.Properties) {
@@ -174,7 +187,7 @@ foreach ($prop in $section.PSObject.Properties) {
     }
 }
 
-Write-Output ("== section $VersionKey entries: " + $rows.Count)
+Write-Output ("== section $sectionKey entries: " + $rows.Count)
 $rows | Format-Table -AutoSize -Wrap | Out-String -Width 200 | Write-Output
 
 $verdicts = @()
@@ -200,4 +213,11 @@ if ($failed.Count -gt 0) {
     $failed | Format-Table -AutoSize -Wrap | Out-String -Width 200 | Write-Output
 }
 Write-Output ("failed=" + $failed.Count)
+if ($probeFrom) {
+    if ($failed.Count -eq 0) {
+        Write-Output "== $VersionKey 与 $probeFrom 结构一致：把 $probeFrom 段复制成 $VersionKey 段即可"
+    } else {
+        Write-Output "== $VersionKey 相对 $probeFrom 有 $($failed.Count) 条需要重新定锚：$((@($failed | ForEach-Object { $_.Rule })) -join ', ')"
+    }
+}
 if ($failed.Count -gt 0) { exit 1 }
